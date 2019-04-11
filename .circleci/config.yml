@@ -1,0 +1,14 @@
+version: 2
+jobs:
+ build:
+   filters:
+     tags:
+       only: /.*/
+   machine: true
+   steps:
+     - checkout
+     - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+     # build the application image
+     - run: docker build -t deissh/avagen:$CIRCLE_BRANCH .
+     # deploy the image
+     - run: docker push deissh/avagen:$CIRCLE_BRANCH

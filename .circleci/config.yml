@@ -17,7 +17,7 @@ workflows:
   build-n-deploy:
     jobs:
       - build
-      - pushdocker:
+      - deploy:
           requires:
             - build
           filters:

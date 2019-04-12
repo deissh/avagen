@@ -4,12 +4,13 @@ jobs:
     machine: true
     steps:
      - checkout
-     - run: docker build -t deissh/avagen:$CIRCLE_TAG .
+     - run: docker build -t deissh/avagen:$CIRCLE_SHA1 .
   deploy:
     machine: true
     steps:
      - checkout
      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
+     - run: docker tag deissh/avagen:$CIRCLE_SHA1 deissh/avagen:$CIRCLE_TAG
      - run: docker push deissh/avagen:$CIRCLE_TAG
 
 workflows:

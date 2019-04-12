@@ -38,7 +38,7 @@ func (ah avatarHandler) fastHTTPHandler(ctx *fasthttp.RequestCtx) {
 
 	length := ctx.QueryArgs().GetUintOrZero("length")
 	if length == 0 {
-		length = 1
+		length = 2
 	}
 
 	b, err := ah.avatar.DrawToBytes(string(name), size, length, enc)

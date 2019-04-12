@@ -104,10 +104,10 @@ func (a *InitialsAvatar) DrawToBytes(name string, size int, count int, encoding 
 
 	// todo: get from cache with params
 	// get from cache
-	//v, ok := a.cache.GetBytes(lru.Key(initials))
-	//if ok {
-	//	return v, nil
-	//}
+	v, ok := a.cache.GetBytes(lru.Key(initials))
+	if ok {
+		return v, nil
+	}
 
 	m := a.drawer.Draw(initials, size, bgcolor)
 
@@ -162,7 +162,7 @@ func getInitials(name string, count int) string {
 	}
 	o := opts{
 		allowEmail: true,
-		limit:      3,
+		limit:      count,
 	}
 	i, _ := parseInitials(strings.NewReader(name), o)
 

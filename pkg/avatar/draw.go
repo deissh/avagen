@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"image/draw"
 	"io/ioutil"
+	"unicode/utf8"
 
 	"github.com/golang/freetype/truetype"
 	"golang.org/x/image/font"
@@ -35,17 +36,17 @@ func newDrawer(fontFile string, fontSize float64) (*drawer, error) {
 	g.dpi = 72.0
 	g.fontHinting = font.HintingNone
 
-	font, err := parseFont(fontFile)
+	parsedfont, err := parseFont(fontFile)
 	if err != nil {
 		return nil, errInvalidFont
 	}
-	g.face = truetype.NewFace(font, &truetype.Options{
+	g.face = truetype.NewFace(parsedfont, &truetype.Options{
 		Size:    g.fontSize,
 		DPI:     g.dpi,
 		Hinting: g.fontHinting,
 	})
 
-	g.font = font
+	g.font = parsedfont
 	return g, nil
 }
 
@@ -77,11 +78,8 @@ func (g *drawer) Draw(s string, size int, bg *color.RGBA) image.Image {
 	}
 
 	// center
-	// todo: rewrite this
 	dY := int((size - int(gbuf.Bounds.Max.Y-gbuf.Bounds.Min.Y)>>6) / 2)
-	//dX := int((size - count * (int(gbuf.Bounds.Max.X-gbuf.Bounds.Min.X)>>6)) / 2)
-	// fixme: magic
-	dX := int((size - (len(s) * (int(gbuf.AdvanceWidth) >> 6)) + (int(gbuf.Bounds.Max.X-gbuf.Bounds.Min.X) >> 7)) / 2)
+	dX := int((size - (utf8.RuneCountInString(s) * (int(gbuf.AdvanceWidth) >> 6))) / 2)
 	y := int(gbuf.Bounds.Max.Y>>6) + dY
 	x := 0 - int(gbuf.Bounds.Min.X>>6) + dX
 
@@ -101,10 +99,10 @@ func parseFont(fontFile string) (*truetype.Font, error) {
 		return nil, err
 	}
 
-	font, err := truetype.Parse(fontBytes)
+	parsedfont, err := truetype.Parse(fontBytes)
 	if err != nil {
 		return nil, err
 	}
 
-	return font, nil
+	return parsedfont, nil
 }

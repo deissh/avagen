@@ -6,8 +6,8 @@ jobs:
         only: /v[0-9]+\.[0-9]+\.[0-9]+/
       branches:
         only: master
-   machine: true
-   steps:
+    machine: true
+    steps:
      - checkout
      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
      # build the application image

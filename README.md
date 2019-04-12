@@ -25,3 +25,11 @@ Desc: Generate new avatars or return from cache
 Params
  * `name` Nick or user name
  * `size` Image size (default 128px)
+
+## Docs
+
+ToDo
+
+#### Glyph metrics
+
+![](https://www.freetype.org/freetype2/docs/tutorial/metrics.png)

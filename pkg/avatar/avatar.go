@@ -90,7 +90,7 @@ func NewWithConfig(cfg Config) *InitialsAvatar {
 //
 // You can optionaly specify the encoding of the file. the supported values are png and jpeg for
 // png images and jpeg images respectively. if no encoding is specified then png is used.
-func (a *InitialsAvatar) DrawToBytes(name string, size int, length int, encoding ...string) ([]byte, error) {
+func (a *InitialsAvatar) DrawToBytes(name string, size int, count int, encoding ...string) ([]byte, error) {
 	if size <= 0 {
 		size = 48 // default size
 	}
@@ -99,7 +99,7 @@ func (a *InitialsAvatar) DrawToBytes(name string, size int, length int, encoding
 	if !isHan(firstRune) && !unicode.IsLetter(firstRune) {
 		return nil, ErrUnsupportChar
 	}
-	initials := getInitials(name, length)
+	initials := getInitials(name, count)
 	bgcolor := getColorByName(name)
 
 	// todo: get from cache with params
@@ -109,7 +109,7 @@ func (a *InitialsAvatar) DrawToBytes(name string, size int, length int, encoding
 	//	return v, nil
 	//}
 
-	m := a.drawer.Draw(initials, size, length, bgcolor)
+	m := a.drawer.Draw(initials, size, bgcolor)
 
 	// encode the image
 	var buf bytes.Buffer
@@ -160,16 +160,13 @@ func getInitials(name string, count int) string {
 	if len(name) == 0 {
 		return ""
 	}
-	//o := opts{
-	//	allowEmail: true,
-	//	limit:      3,
-	//}
-	//i, _ := parseInitials(strings.NewReader(name), o)
-	if len(name) <= count {
-		return name
+	o := opts{
+		allowEmail: true,
+		limit:      3,
 	}
+	i, _ := parseInitials(strings.NewReader(name), o)
 
-	return name[0:count]
+	return i
 }
 
 func init() {

@@ -11,6 +11,12 @@ jobs:
      - checkout
      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
      # build the application image
-     - run: docker build -t deissh/avagen:$CIRCLE_TAG .
-     # deploy the image
-     - run: docker push deissh/avagen:$CIRCLE_TAG
+     - type: deploy
+       name: "Publish on release tags"
+       command: |
+         set -eu
+         TAG=$(git describe --tags)
+         if [[ $TAG =~ ^[0-9]+(\.[0-9]+)+(-rc[0-9]+)?(-alpha[0-9]+)?$ ]]; then
+           docker build -t deissh/avagen:$TAG .
+           docker push deissh/avagen:$TAG
+         fi

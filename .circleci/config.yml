@@ -1,11 +1,11 @@
-version: 2
+version: 2.1
 jobs:
   build:
     machine: true
     steps:
      - checkout
      - run: docker build -t deissh/avagen:$CIRCLE_TAG .
-  pushdocker:
+  deploy:
     machine: true
     steps:
      - checkout
@@ -14,10 +14,14 @@ jobs:
 
 workflows:
   version: 2
-  tagged-build:
+  build-n-deploy:
     jobs:
       - build
       - pushdocker:
+          requires:
+            - build
           filters:
             tags:
               only: /^v.*/
+            branches:
+              ignore: /.*/

@@ -50,7 +50,7 @@ func newDrawer(fontFile string, fontSize float64) (*drawer, error) {
 }
 
 // our avatar image is square
-func (g *drawer) Draw(s string, size int, bg *color.RGBA) image.Image {
+func (g *drawer) Draw(s string, size int, count int, bg *color.RGBA) image.Image {
 	// draw the background
 	dst := image.NewRGBA(image.Rect(0, 0, size, size))
 	draw.Draw(dst, dst.Bounds(), &image.Uniform{bg}, image.ZP, draw.Src)
@@ -77,8 +77,11 @@ func (g *drawer) Draw(s string, size int, bg *color.RGBA) image.Image {
 	}
 
 	// center
-	dY := int((size - int(gbuf.Bounds.Max.Y-gbuf.Bounds.Min.Y)>>6) / 2)
-	dX := int((size - int(gbuf.Bounds.Max.X-gbuf.Bounds.Min.X)>>6) / 2)
+	// todo: rewrite this
+	dY := int((size - int(gbuf.Bounds.Max.Y - gbuf.Bounds.Min.Y)>>6) / 2)
+	//dX := int((size - count * (int(gbuf.Bounds.Max.X-gbuf.Bounds.Min.X)>>6)) / 2)
+	// fixme: magic
+	dX := int((size - (count * (int(gbuf.AdvanceWidth)>>6)) + (int(gbuf.Bounds.Max.X-gbuf.Bounds.Min.X)>>7)) / 2)
 	y := int(gbuf.Bounds.Max.Y>>6) + dY
 	x := 0 - int(gbuf.Bounds.Min.X>>6) + dX
 

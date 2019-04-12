@@ -26,9 +26,24 @@ func (ah avatarHandler) fastHTTPHandler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	b, _ := ah.avatar.DrawToBytes(string(name), 128, "png")
+	enc := string(ctx.QueryArgs().Peek("type"))
+	if enc == "" {
+		enc = "png"
+	}
 
-	ctx.SetContentType("image/png")
+	size := ctx.QueryArgs().GetUintOrZero("size")
+	if size == 0 {
+		size = 128
+	}
+
+	length := ctx.QueryArgs().GetUintOrZero("length")
+	if length == 0 {
+		length = 2
+	}
+
+	b, _ := ah.avatar.DrawToBytes(string(name), size, length, enc)
+
+	ctx.SetContentType("image/" + enc)
 	ctx.Response.Header.Set("Cache-Control", "max-age=600")
 	ctx.SetBody(b)
 	ctx.SetStatusCode(http.StatusOK)

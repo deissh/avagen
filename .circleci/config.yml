@@ -1,11 +1,6 @@
 version: 2
 jobs:
   build:
-    filters:
-      tags:
-        only: /v[0-9]+\.[0-9]+\.[0-9]+/
-      branches:
-        only: master
     machine: true
     steps:
      - checkout
@@ -20,3 +15,14 @@ jobs:
            docker build -t deissh/avagen:$TAG .
            docker push deissh/avagen:$TAG
          fi
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - build
+        filters:
+          tags:
+            only: /v[0-9]+\.[0-9]+\.[0-9]+/
+          branches:
+            only: master

@@ -41,7 +41,12 @@ func (ah avatarHandler) fastHTTPHandler(ctx *fasthttp.RequestCtx) {
 		length = 1
 	}
 
-	b, _ := ah.avatar.DrawToBytes(string(name), size, length, enc)
+	b, err := ah.avatar.DrawToBytes(string(name), size, length, enc)
+	if err != nil {
+		ctx.SetStatusCode(http.StatusBadRequest)
+		_, _ = ctx.WriteString(err.Error())
+		return
+	}
 
 	ctx.SetContentType("image/" + enc)
 	ctx.Response.Header.Set("Cache-Control", "max-age=600")

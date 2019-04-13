@@ -7,14 +7,10 @@ jobs:
 
     steps:
       - checkout
-      - run:
-        name: run build
-        command: |
+      - run: |
           go get -insecure ./...
           go build -v
-      - run:
-        name: run tests
-        command: |
+      - run: |
           go fmt ./...
           go vet ./...
           go test -v ./...

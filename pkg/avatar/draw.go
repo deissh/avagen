@@ -6,7 +6,6 @@ import (
 	"image/color"
 	"image/draw"
 	"io/ioutil"
-	"unicode/utf8"
 
 	"github.com/golang/freetype/truetype"
 	"golang.org/x/image/font"
@@ -68,18 +67,12 @@ func (g *drawer) Draw(s string, size int, bg *color.RGBA) image.Image {
 
 	// glyph example: http://www.freetype.org/freetype2/docs/tutorial/metrics.png
 	var gbuf truetype.GlyphBuf
-	var err error
 	fsize := fixed.Int26_6(g.fontSize * g.dpi * (64.0 / 72.0))
-	err = gbuf.Load(g.font, fsize, fi, font.HintingFull)
-	if err != nil {
-		// fixme
-		drawer.DrawString("")
-		return dst
-	}
+	_ = gbuf.Load(g.font, fsize, fi, font.HintingFull)
 
 	// center
 	dY := int((size - int(gbuf.Bounds.Max.Y-gbuf.Bounds.Min.Y)>>6) / 2)
-	dX := int((size - (utf8.RuneCountInString(s) * (int(gbuf.AdvanceWidth) >> 6))) / 2)
+	dX := int((size - (len([]rune(s)) * (int(gbuf.AdvanceWidth) >> 6))) / 2)
 	y := int(gbuf.Bounds.Max.Y>>6) + dY
 	x := 0 - int(gbuf.Bounds.Min.X>>6) + dX
 

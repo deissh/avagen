@@ -3,13 +3,22 @@ jobs:
   build:
     docker:
       - image: circleci/golang:1.11
+    working_directory: /go/src/github.com/deissh/avagen
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - v1-pkg-cache
       - run: go get -insecure ./...
       - run: go build -v
       - run: go fmt ./...
       - run: go vet ./...
       - run: go test -v ./...
+
+      - save_cache:
+          key: v1-pkg-cache
+          paths:
+            - "/go/pkg"
 
   deploy:
     machine: true

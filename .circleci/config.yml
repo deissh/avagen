@@ -1,10 +1,8 @@
-version: 2.1
+version: 2
 jobs:
   build:
     docker:
       - image: circleci/golang:1.11
-    working_dirictory: ~/repo
-
     steps:
       - checkout
       - run: go get -insecure ./...

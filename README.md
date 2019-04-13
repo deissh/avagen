@@ -41,6 +41,10 @@ Params
  * `size` Avatar size (default 128px)
  * `type` Avatar type (png or jpeg)
 
+```bash
+$ curl http://127.0.0.1:8080?name=john+doe&type=png
+```
+
 ### lib Example
 
 ```bash

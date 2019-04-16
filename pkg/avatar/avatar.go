@@ -3,6 +3,7 @@ package avatar
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"image/color"
 	"image/jpeg"
 	"image/png"
@@ -28,8 +29,8 @@ var (
 
 	defaultColorKey = "45BDF3"
 
-	// ErrUnsupportChar is returned when the character is not supported
-	ErrUnsupportChar = errors.New("unsupported character")
+	// ErrUnsupportedChar is returned when the character is not supported
+	ErrUnsupportedChar = errors.New("unsupported character")
 
 	// ErrUnsupportedEncoding is returned when the given image encoding is not supported
 	ErrUnsupportedEncoding = errors.New("avatar: Unsuppored encoding")
@@ -95,9 +96,13 @@ func (a *InitialsAvatar) DrawToBytes(name string, size int, count int, encoding 
 		size = 48 // default size
 	}
 	name = strings.TrimSpace(name)
+	if name == "" {
+		return nil, fmt.Errorf("Name cannot be empty")
+	}
+
 	firstRune := []rune(name)[0]
-	if !isHan(firstRune) && !unicode.IsLetter(firstRune) {
-		return nil, ErrUnsupportChar
+	if !isHan(firstRune) && !unicode.IsLetter(firstRune) && !unicode.IsDigit(firstRune) {
+		return nil, ErrUnsupportedChar
 	}
 	initials := getInitials(name, count)
 	bgcolor := getColorByName(name)

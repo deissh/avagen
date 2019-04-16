@@ -73,6 +73,9 @@ func parseInitials(src io.Reader, o opts) (string, error) {
 			}
 			_, _ = buf.WriteRune(x)
 			count++
+		case unicode.IsDigit(x):
+			_, _ = buf.WriteRune(x)
+			count++
 		case x == '(':
 			if i > 0 {
 				rb := &bytes.Buffer{}

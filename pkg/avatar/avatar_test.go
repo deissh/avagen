@@ -179,7 +179,7 @@ func TestInitialsAvatar_DrawToBytes(t *testing.T) {
 	for _, v := range stuffs {
 		raw, err := av.DrawToBytes(v.name, v.size, v.count, v.encoding)
 		if err != nil {
-			if err == ErrUnsupportChar {
+			if err == ErrUnsupportedChar {
 				t.Skip("ErrUnsupportChar")
 			}
 			t.Error(err)

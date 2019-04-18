@@ -60,7 +60,7 @@ func Test_getInitials(t *testing.T) {
 				name:  "deissh",
 				count: 1,
 			},
-			want: "d",
+			want: "D",
 		},
 		{
 			name: "one unicode symbol",
@@ -68,7 +68,7 @@ func Test_getInitials(t *testing.T) {
 				name:  "что-то",
 				count: 1,
 			},
-			want: "ч",
+			want: "Ч",
 		},
 		{
 			name: "two symbols from sentence",
@@ -76,7 +76,7 @@ func Test_getInitials(t *testing.T) {
 				name:  "some sentence",
 				count: 2,
 			},
-			want: "ss",
+			want: "SS",
 		},
 		{
 			name: "two symbols from unicode sentence",
@@ -84,7 +84,7 @@ func Test_getInitials(t *testing.T) {
 				name:  "какое то",
 				count: 2,
 			},
-			want: "кт",
+			want: "КТ",
 		},
 		{
 			name: "should return empty",
@@ -108,7 +108,7 @@ func Test_getInitials(t *testing.T) {
 				name:  "joe@example.com",
 				count: 1,
 			},
-			want: "j",
+			want: "J",
 		},
 		{
 			name: "should return from email",
@@ -116,7 +116,7 @@ func Test_getInitials(t *testing.T) {
 				name:  "joe@example.com",
 				count: 2,
 			},
-			want: "j",
+			want: "J",
 		},
 		{
 			name: "should return from name with ( & )",
@@ -124,7 +124,7 @@ func Test_getInitials(t *testing.T) {
 				name:  "John Doe (dj)",
 				count: 1,
 			},
-			want: "j",
+			want: "J",
 		},
 		{
 			name: "should return from name with ( & )",
@@ -132,7 +132,7 @@ func Test_getInitials(t *testing.T) {
 				name:  "John Doe (dj)",
 				count: 2,
 			},
-			want: "jd",
+			want: "JD",
 		},
 		{
 			name: "should return from name with ( & )",
@@ -153,7 +153,7 @@ func Test_getInitials(t *testing.T) {
 }
 
 func TestInitialsAvatar_DrawToBytes(t *testing.T) {
-	av := New("../../wqy-zenhei.ttf")
+	av := New("../../Cousine-Bold.ttf")
 
 	stuffs := []struct {
 		name     string

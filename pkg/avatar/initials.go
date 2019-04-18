@@ -66,7 +66,7 @@ func parseInitials(src io.Reader, o opts) (string, error) {
 		}
 		switch {
 		case unicode.IsLetter(x):
-			_, _ = buf.WriteRune(unicode.ToLower(x))
+			_, _ = buf.WriteRune(unicode.ToUpper(x))
 			count++
 		case unicode.IsDigit(x):
 			_, _ = buf.WriteRune(x)

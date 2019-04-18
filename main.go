@@ -55,7 +55,7 @@ func (ah avatarHandler) fastHTTPHandler(ctx *fasthttp.RequestCtx) {
 }
 
 func main() {
-	h := newAvatarHandler("wqy-zenhei.ttf")
+	h := newAvatarHandler("Cousine-Bold.ttf")
 
 	_ = fasthttp.ListenAndServe(":8080", h.fastHTTPHandler)
 }

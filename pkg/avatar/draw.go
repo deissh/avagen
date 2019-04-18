@@ -71,8 +71,12 @@ func (g *drawer) Draw(s string, size int, bg *color.RGBA) image.Image {
 
 	// center
 	dY := int((size - int(gbuf.Bounds.Max.Y-gbuf.Bounds.Min.Y)>>6) / 2)
-	dX := ((size - (len([]rune(s)) * int(gbuf.AdvanceWidth) >> 6)) + ((int(gbuf.AdvanceWidth)>>6)-(int(gbuf.Bounds.Max.X-gbuf.Bounds.Min.X)>>6))*len([]rune(s))) / 2
-	//dX := (int(size - len([]rune(s)) * (int(gbuf.AdvanceWidth) >> 6) - int(gbuf.AdvanceWidth) >> 6) - int(gbuf.Bounds.Max.X + gbuf.Bounds.Min.X) >> 6 ) / 2
+
+	// with only mono fonts
+	dX := (size - (len([]rune(s)) * int(gbuf.AdvanceWidth) >> 6)) / 2
+	// other fonts
+	//dX := ((size - (len([]rune(s)) * int(gbuf.AdvanceWidth) >> 6)) + ((int(gbuf.AdvanceWidth)>>6)-(int(gbuf.Bounds.Max.X-gbuf.Bounds.Min.X)>>6))*len([]rune(s))) / 2
+
 	y := int(gbuf.Bounds.Max.Y>>6) + dY
 
 	drawer.Dot = fixed.Point26_6{

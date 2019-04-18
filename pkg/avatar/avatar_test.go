@@ -124,7 +124,7 @@ func Test_getInitials(t *testing.T) {
 				name:  "John Doe (dj)",
 				count: 1,
 			},
-			want: "J",
+			want: "j",
 		},
 		{
 			name: "should return from name with ( & )",
@@ -132,7 +132,7 @@ func Test_getInitials(t *testing.T) {
 				name:  "John Doe (dj)",
 				count: 2,
 			},
-			want: "JD",
+			want: "jd",
 		},
 		{
 			name: "should return from name with ( & )",

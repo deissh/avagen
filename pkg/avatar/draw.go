@@ -2,14 +2,13 @@ package avatar
 
 import (
 	"errors"
+	"github.com/golang/freetype/truetype"
+	"golang.org/x/image/font"
+	"golang.org/x/image/math/fixed"
 	"image"
 	"image/color"
 	"image/draw"
 	"io/ioutil"
-
-	"github.com/golang/freetype/truetype"
-	"golang.org/x/image/font"
-	"golang.org/x/image/math/fixed"
 )
 
 var (
@@ -72,12 +71,12 @@ func (g *drawer) Draw(s string, size int, bg *color.RGBA) image.Image {
 
 	// center
 	dY := int((size - int(gbuf.Bounds.Max.Y-gbuf.Bounds.Min.Y)>>6) / 2)
-	dX := int((size - (len([]rune(s)) * (int(gbuf.AdvanceWidth) >> 6))) / 2)
+	dX := ((size - (len([]rune(s)) * int(gbuf.AdvanceWidth) >> 6)) + ((int(gbuf.AdvanceWidth)>>6)-(int(gbuf.Bounds.Max.X-gbuf.Bounds.Min.X)>>6))*len([]rune(s))) / 2
+	//dX := (int(size - len([]rune(s)) * (int(gbuf.AdvanceWidth) >> 6) - int(gbuf.AdvanceWidth) >> 6) - int(gbuf.Bounds.Max.X + gbuf.Bounds.Min.X) >> 6 ) / 2
 	y := int(gbuf.Bounds.Max.Y>>6) + dY
-	x := 0 - int(gbuf.Bounds.Min.X>>6) + dX
 
 	drawer.Dot = fixed.Point26_6{
-		X: fixed.I(x),
+		X: fixed.I(dX),
 		Y: fixed.I(y),
 	}
 	drawer.DrawString(s)

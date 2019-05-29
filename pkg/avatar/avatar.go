@@ -16,15 +16,15 @@ import (
 
 var (
 	avatarBgColors = map[string]*color.RGBA{
-		"45BDF3": &color.RGBA{69, 189, 243, 255},
-		"E08F70": &color.RGBA{224, 143, 112, 255},
-		"4DB6AC": &color.RGBA{77, 182, 172, 255},
-		"9575CD": &color.RGBA{149, 117, 205, 255},
-		"B0855E": &color.RGBA{176, 133, 94, 255},
-		"F06292": &color.RGBA{240, 98, 146, 255},
-		"A3D36C": &color.RGBA{163, 211, 108, 255},
-		"7986CB": &color.RGBA{121, 134, 203, 255},
-		"F1B91D": &color.RGBA{241, 185, 29, 255},
+		"45BDF3": {69, 189, 243, 255},
+		"E08F70": {224, 143, 112, 255},
+		"4DB6AC": {77, 182, 172, 255},
+		"9575CD": {149, 117, 205, 255},
+		"B0855E": {176, 133, 94, 255},
+		"F06292": {240, 98, 146, 255},
+		"A3D36C": {163, 211, 108, 255},
+		"7986CB": {121, 134, 203, 255},
+		"F1B91D": {241, 185, 29, 255},
 	}
 
 	defaultColorKey = "45BDF3"
@@ -91,7 +91,7 @@ func NewWithConfig(cfg Config) *InitialsAvatar {
 //
 // You can optionaly specify the encoding of the file. the supported values are png and jpeg for
 // png images and jpeg images respectively. if no encoding is specified then png is used.
-func (a *InitialsAvatar) DrawToBytes(name string, size int, count int, encoding ...string) ([]byte, error) {
+func (a *InitialsAvatar) DrawToBytes(name string, size int, count int, encoding string) ([]byte, error) {
 	if size <= 0 {
 		size = 48 // default size
 	}
@@ -109,7 +109,7 @@ func (a *InitialsAvatar) DrawToBytes(name string, size int, count int, encoding 
 
 	// todo: get from cache with params
 	// get from cache
-	v, ok := a.cache.GetBytes(lru.Key(initials))
+	v, ok := a.cache.GetBytes(lru.Key(name + ":" + string(size) + ":" + string(count) + ":" + encoding))
 	if ok {
 		return v, nil
 	}
@@ -118,11 +118,7 @@ func (a *InitialsAvatar) DrawToBytes(name string, size int, count int, encoding 
 
 	// encode the image
 	var buf bytes.Buffer
-	enc := "png"
-	if len(encoding) > 0 {
-		enc = encoding[0]
-	}
-	switch enc {
+	switch encoding {
 	case "jpeg":
 		err := jpeg.Encode(&buf, m, nil)
 		if err != nil {
@@ -138,7 +134,7 @@ func (a *InitialsAvatar) DrawToBytes(name string, size int, count int, encoding 
 	}
 
 	// set cache
-	a.cache.SetBytes(lru.Key(initials), buf.Bytes())
+	a.cache.SetBytes(lru.Key(name+":"+string(size)+":"+string(count)+":"+string(encoding)), buf.Bytes())
 
 	return buf.Bytes(), nil
 }

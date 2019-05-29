@@ -20,8 +20,9 @@ func newAvatarHandler(fontFile string) *avatarHandler {
 }
 
 func (ah avatarHandler) fastHTTPHandler(ctx *fasthttp.RequestCtx) {
-	name := ctx.QueryArgs().Peek("name")
-	if name == nil || string(name) == "" {
+	ctx.Logger().Printf("")
+	name := string(ctx.QueryArgs().Peek("name"))
+	if name == "" {
 		ctx.SetStatusCode(http.StatusBadRequest)
 		return
 	}
@@ -41,7 +42,7 @@ func (ah avatarHandler) fastHTTPHandler(ctx *fasthttp.RequestCtx) {
 		length = 2
 	}
 
-	b, err := ah.avatar.DrawToBytes(string(name), size, length, enc)
+	b, err := ah.avatar.DrawToBytes(name, size, length, enc)
 	if err != nil {
 		ctx.SetStatusCode(http.StatusBadRequest)
 		_, _ = ctx.WriteString(err.Error())

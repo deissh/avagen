@@ -74,9 +74,14 @@ func parseInitials(src io.Reader, o opts) (string, error) {
 		case x == '(':
 			if i > 0 {
 				rb := &bytes.Buffer{}
+
+				crCount := 0
 			DONE:
 				for {
 					next, _, err := r.ReadRune()
+					if crCount >= o.limit {
+						break DONE
+					}
 					switch next {
 					case ')':
 						_, _, err = r.ReadRune()
@@ -88,10 +93,10 @@ func parseInitials(src io.Reader, o opts) (string, error) {
 						break DONE
 					default:
 						if err != nil {
-							rb.Reset()
 							break DONE
 						}
 						_, _ = rb.WriteRune(next)
+						crCount++
 					}
 
 				}

@@ -33,7 +33,7 @@ func (ah avatarHandler) fastHTTPHandler(ctx *fasthttp.RequestCtx) {
 	}
 
 	size := ctx.QueryArgs().GetUintOrZero("size")
-	if size == 0 {
+	if size <= 0 || size >= 1024 {
 		size = 128
 	}
 

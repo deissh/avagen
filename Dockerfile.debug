@@ -1,0 +1,30 @@
+# Compile stage
+FROM golang:1.13 AS build-env
+
+WORKDIR $GOPATH/src/github.com/deissh/avagen
+COPY . ./
+
+# Install deps
+RUN go mod download
+
+# The -gcflags "all=-N -l" flag helps us get a better debug experience
+RUN CGO_ENABLED=0 GOOS=linux go build -gcflags "all=-N -l" -o /server .
+
+# Compile Delve
+RUN go get -u github.com/go-delve/delve/cmd/dlv
+
+# Final stage
+FROM alpine:3.8
+
+# Port 8080 belongs to our application, 40000 belongs to Delve
+EXPOSE 8080 40000
+
+RUN apk add --no-cache libc6-compat
+WORKDIR /
+
+COPY --from=build-env /server /
+COPY --from=build-env /go/bin/dlv /go/bin/dlv
+COPY Cousine-Bold.ttf /Cousine-Bold.ttf
+
+# Run delve
+CMD ["/go/bin/dlv", "--listen=:40000", "--headless=true", "--api-version=2", "exec", "/server"]

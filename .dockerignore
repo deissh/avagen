@@ -1,0 +1,7 @@
+.gitignore
+.dockerignore
+README.md
+/.circleci
+LICENSE
+Dockerfile
+Dockerfile.debug

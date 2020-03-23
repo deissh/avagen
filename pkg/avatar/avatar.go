@@ -109,10 +109,10 @@ func (a *InitialsAvatar) DrawToBytes(name string, size int, count int, encoding 
 
 	// todo: get from cache with params
 	// get from cache
-	v, ok := a.cache.GetBytes(lru.Key(name + ":" + string(size) + ":" + string(count) + ":" + encoding))
-	if ok {
-		return v, nil
-	}
+	//v, ok := a.cache.GetBytes(lru.Key(name + ":" + string(size) + ":" + string(count) + ":" + encoding))
+	//if ok {
+	//	return v, nil
+	//}
 
 	m := a.drawer.Draw(initials, size, bgcolor)
 
@@ -134,7 +134,7 @@ func (a *InitialsAvatar) DrawToBytes(name string, size int, count int, encoding 
 	}
 
 	// set cache
-	a.cache.SetBytes(lru.Key(name+":"+string(size)+":"+string(count)+":"+string(encoding)), buf.Bytes())
+	//a.cache.SetBytes(lru.Key(name+":"+string(size)+":"+string(count)+":"+string(encoding)), buf.Bytes())
 
 	return buf.Bytes(), nil
 }

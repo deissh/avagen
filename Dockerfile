@@ -7,9 +7,9 @@ RUN go get -insecure ./...
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix nocgo -o /server .
 
 FROM scratch
-COPY --from=builder /server ./server
+COPY --from=builder /server /avagen
 # Add fronts
 COPY Cousine-Bold.ttf Cousine-Bold.ttf
 
 EXPOSE 8080
-ENTRYPOINT ["./server -address 127.0.0.1:8080"]
+CMD ["/avagen", "-address", "127.0.0.1:8080"]

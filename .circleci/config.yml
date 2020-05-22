@@ -26,8 +26,17 @@ jobs:
      - checkout
      - run: docker build -t deissh/avagen:$CIRCLE_SHA1 .
      - run: docker login -u $DOCKER_USER -p $DOCKER_PASS
-     - run: docker tag deissh/avagen:$CIRCLE_SHA1 deissh/avagen:$CIRCLE_TAG
-     - run: docker push deissh/avagen:$CIRCLE_TAG
+     - type: shell
+       name: Build docker image
+       command: |
+         if git log -1 --pretty=%B | grep "^[0-9]\+\.[0-9]\+\.[0-9]\+$";
+         then
+           version=$(git log -1 --pretty=%B)
+           docker tag deissh/avagen:$CIRCLE_SHA1 deissh/avagen:$version
+           docker push deissh/avagen:$version
+         else
+           echo "Not a release, skipping build"
+         fi
 
 workflows:
   version: 2
@@ -37,6 +46,3 @@ workflows:
       - deploy:
           requires:
             - build
-          filters:
-            tags:
-              only: /^v.*/

@@ -4,6 +4,12 @@
 $ avagen g "Fist Second" > image.png
 $ avagen g "Fist Second" --type jpeg > image.jpeg
 $ avagen g "Fist Second" --plugin identicon> image.png
+
+# simple avatar server
+$ avagen serve 
+$ avagen serve --addr 0.0.0.0:8080
+# request
+$ curl --output avatar.png http://0.0.0.0:8080?name=Example%20Name&type=jpeg
 ```
 
 ```go

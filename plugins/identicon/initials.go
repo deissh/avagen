@@ -49,5 +49,9 @@ func GetInitials(s string, o opts) ([]rune, error) {
 		}
 	}
 
-	return initials[0:o.limit], nil
+	if len(initials) > o.limit {
+		return initials[0:o.limit], nil
+	}
+
+	return initials, nil
 }

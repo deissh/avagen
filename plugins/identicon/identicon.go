@@ -2,7 +2,7 @@ package identicon
 
 import (
 	"bytes"
-	"github.com/deissh/avagen/app"
+	"github.com/deissh/avagen/plugins"
 	"github.com/golang/freetype/truetype"
 	"github.com/pkg/errors"
 	"golang.org/x/image/draw"
@@ -28,17 +28,17 @@ func init() {
 	corpus := Corpus{
 		//todo: load from configuration
 		fontFile:    "RobotoMono-Regular.ttf",
-		fontSize:    64,
-		dpi:         72.0,
+		fontSize:    50,
+		dpi:         100,
 		fontHinting: font.HintingFull,
 	}
 
-	app.RegisterPlugin(app.Plugin{
+	plugins.Register(plugins.Plugin{
 		Name:        "identicon",
 		Description: "default handler",
 		Version:     1,
 
-		Args: []app.Arg{
+		Args: []plugins.Arg{
 			{
 				Key:      "name",
 				Required: true,
@@ -71,15 +71,15 @@ func (c *Corpus) Preload() error {
 	return nil
 }
 
-func (c *Corpus) Generate(args app.ParsedArg) ([]byte, error) {
+func (c *Corpus) Generate(args plugins.ParsedArg) ([]byte, error) {
 	name := args["name"]
 	imgType := args["type"]
 
 	bg := getColorByName(name)
 	initials, err := GetInitials(name, opts{
-		limit:      2,
-		allCaps:    true,
-		allowEmail: true,
+		limit:     2,
+		allCaps:   true,
+		allowSpec: true,
 	})
 	if err != nil {
 		return nil, errors.Wrap(err, "parseInitials error")
@@ -89,7 +89,7 @@ func (c *Corpus) Generate(args app.ParsedArg) ([]byte, error) {
 	dst := image.NewRGBA(image.Rect(0, 0, 128, 128))
 
 	// fill background
-	draw.Draw(dst, dst.Bounds(), &image.Uniform{C: bg}, image.ZP, draw.Src)
+	draw.Draw(dst, dst.Bounds(), &image.Uniform{C: bg}, image.Point{}, draw.Src)
 
 	// draw text in center
 	// since the font is monospaced, you can use any letter to get the size
@@ -103,7 +103,7 @@ func (c *Corpus) Generate(args app.ParsedArg) ([]byte, error) {
 	// https://www.freetype.org/freetype2/docs/tutorial/metrics.png
 
 	dY := 128/2 + (int(bounds.Max.Y)>>6-int(bounds.Min.Y)>>6)/2
-	dX := (128 - (len([]rune(initials)) * int(advance) >> 6)) / 2
+	dX := (128 - (len(initials) * int(advance) >> 6)) / 2
 
 	point := fixed.Point26_6{X: fixed.I(dX), Y: fixed.I(dY)}
 	drawer := &font.Drawer{
@@ -112,7 +112,7 @@ func (c *Corpus) Generate(args app.ParsedArg) ([]byte, error) {
 		Face: c.face,
 		Dot:  point,
 	}
-	drawer.DrawString(initials)
+	drawer.DrawString(string(initials))
 
 	// encode result
 	var buf bytes.Buffer

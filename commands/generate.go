@@ -1,11 +1,11 @@
 package commands
 
 import (
+	"github.com/deissh/avagen/plugins"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"os"
 
-	"github.com/deissh/avagen/app"
 	// load plugins
 	_ "github.com/deissh/avagen/plugins/identicon"
 )
@@ -38,17 +38,20 @@ func AvatarGenerateCmdF(command *cobra.Command, args []string) error {
 		return errors.Wrap(err, "failed reading image type")
 	}
 
-	plugin, err := app.GetPlugin(pluginName)
+	plugin, err := plugins.Get(pluginName)
 	if err != nil {
 		return err
 	}
 
-	data, err := plugin.Generate(app.ParsedArg{"name": name, "type": imageType})
+	data, err := plugin.Generate(plugins.ParsedArg{"name": name, "type": imageType})
 	if err != nil {
 		return err
 	}
 
-	os.Stdout.Write(data)
+	_, err = os.Stdout.Write(data)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

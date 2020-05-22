@@ -1,4 +1,4 @@
-package app
+package plugins
 
 import (
 	"errors"
@@ -29,8 +29,8 @@ var (
 	plugins = map[string]Plugin{}
 )
 
-// RegisterPlugin plugin and call Ready() when preload func done
-func RegisterPlugin(corpus Plugin) {
+// Register plugin and call Ready() when preload func done
+func Register(corpus Plugin) {
 	if err := corpus.Preload(); err != nil {
 		log.Panicln(" > error preload:", err)
 		return
@@ -39,8 +39,8 @@ func RegisterPlugin(corpus Plugin) {
 	plugins[corpus.Name] = corpus
 }
 
-// GetPlugins return all loaded plugins
-func GetPlugins() []Plugin {
+// GetAll return all loaded plugins
+func GetAll() []Plugin {
 	res := make([]Plugin, 0)
 	for _, corpus := range plugins {
 		res = append(res, corpus)
@@ -49,8 +49,8 @@ func GetPlugins() []Plugin {
 	return res
 }
 
-// GetPlugin by name
-func GetPlugin(name string) (Plugin, error) {
+// Get by name
+func Get(name string) (Plugin, error) {
 	if val, ok := plugins[name]; ok {
 		return val, nil
 	}

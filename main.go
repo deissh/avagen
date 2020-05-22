@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/deissh/avagen/cmd/avagen/commands"
+	"github.com/deissh/avagen/commands"
 	_ "github.com/deissh/avagen/plugins/identicon"
 	"os"
 )

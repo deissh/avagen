@@ -1,102 +1,54 @@
 package identicon
 
 import (
-	"bufio"
-	"bytes"
-	"io"
 	"regexp"
 	"strings"
-	"unicode"
 )
 
-const email = "^(((([a-zA-Z]|\\d|[!#\\$%&'\\*\\+\\-\\/=\\?\\^_`{\\|}~]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])+(\\.([a-zA-Z]|\\d|[!#\\$%&'\\*\\+\\-\\/=\\?\\^_`{\\|}~]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])+)*)|((\\x22)((((\\x20|\\x09)*(\\x0d\\x0a))?(\\x20|\\x09)+)?(([\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x7f]|\\x21|[\\x23-\\x5b]|[\\x5d-\\x7e]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])|(\\([\\x01-\\x09\\x0b\\x0c\\x0d-\\x7f]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}]))))*(((\\x20|\\x09)*(\\x0d\\x0a))?(\\x20|\\x09)+)?(\\x22)))@((([a-zA-Z]|\\d|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])|(([a-zA-Z]|\\d|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])([a-zA-Z]|\\d|-|\\.|_|~|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])*([a-zA-Z]|\\d|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])))\\.)+(([a-zA-Z]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])|(([a-zA-Z]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])([a-zA-Z]|\\d|-|\\.|_|~|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])*([a-zA-Z]|[\\x{00A0}-\\x{D7FF}\\x{F900}-\\x{FDCF}\\x{FDF0}-\\x{FFEF}])))\\.?$"
-
-var regxEmail *regexp.Regexp
-
-func init() {
-	regxEmail = regexp.MustCompile(email)
-}
+var spec = regexp.MustCompile(`[!@#$%^&*(),.?":{}|<>_]`)
 
 // This controls how parsing of initials is handled.
 type opts struct {
-	allCaps    bool
-	allowEmail bool
-	limit      int
+	allCaps   bool
+	allowSpec bool
+	limit     int
 }
 
-func GetInitials(s string, o opts) (string, error) {
-	return parseInitials(strings.NewReader(s), o)
-}
+func GetInitials(s string, o opts) ([]rune, error) {
+	nameOrInitials := strings.TrimSpace(s)
 
-func parseInitials(s *strings.Reader, o opts) (string, error) {
-	scanner := bufio.NewScanner(s)
-	scanner.Split(bufio.ScanWords)
-	var words []string
-	for scanner.Scan() {
-		words = append(words, scanner.Text())
+	if o.allCaps {
+		nameOrInitials = strings.ToUpper(nameOrInitials)
 	}
-	if err := scanner.Err(); err != nil {
-		return "", err
+	if o.allowSpec {
+		nameOrInitials = spec.ReplaceAllString(nameOrInitials, "")
 	}
-	buf := &bytes.Buffer{}
-	count := 0
-	for i, w := range words {
-		if count >= o.limit {
-			break
-		}
-		if regxEmail.MatchString(w) {
-			if i == 0 && o.allowEmail {
-				s := strings.Split(w, "@")
-				sr := strings.NewReader(s[0])
-				return parseInitials(sr, o)
+
+	nameOrInitials = strings.TrimSpace(s)
+	names := strings.Split(nameOrInitials, " ")
+
+	initials := []rune(nameOrInitials)
+	assignedNames := 0
+
+	if len(names) > 1 {
+		initials = []rune("")
+		start := 0
+
+		for i := 0; i < o.limit; i++ {
+			index := i
+
+			if ((index == o.limit-1) && index > 0) || (index > (len(names) - 1)) {
+				index = len(names) - 1
 			}
-			continue
-		}
-		r := strings.NewReader(w)
-		x, _, err := r.ReadRune()
-		if err != nil {
-			return "", err
-		}
-		switch {
-		case unicode.IsLetter(x):
-			_, _ = buf.WriteRune(unicode.ToUpper(x))
-			count++
-		case unicode.IsDigit(x):
-			_, _ = buf.WriteRune(x)
-			count++
-		case x == '(':
-			if i > 0 {
-				rb := &bytes.Buffer{}
 
-				crCount := 0
-			DONE:
-				for {
-					next, _, err := r.ReadRune()
-					if crCount >= o.limit {
-						break DONE
-					}
-					switch next {
-					case ')':
-						_, _, err = r.ReadRune()
-						if err != nil {
-							if err != io.EOF {
-								rb.Reset()
-							}
-						}
-						break DONE
-					default:
-						if err != nil {
-							break DONE
-						}
-						_, _ = rb.WriteRune(next)
-						crCount++
-					}
-
-				}
-				return rb.String(), nil
+			if assignedNames >= len(names) {
+				start += 1
 			}
-		}
 
+			initials = append(initials, []rune(names[index])[start])
+			assignedNames += 1
+		}
 	}
-	return buf.String(), nil
+
+	return initials[0:o.limit], nil
 }

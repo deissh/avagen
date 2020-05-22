@@ -24,7 +24,6 @@ func GetInitials(s string, o opts) ([]rune, error) {
 		nameOrInitials = spec.ReplaceAllString(nameOrInitials, "")
 	}
 
-	nameOrInitials = strings.TrimSpace(s)
 	names := strings.Split(nameOrInitials, " ")
 
 	initials := []rune(nameOrInitials)

@@ -59,8 +59,6 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 	// default values
 	args := plugins.ParsedArg{
 		"plugin": "identicon",
-		"type":   "png",
-		"name":   "Avatar Generator",
 	}
 
 	ctx.QueryArgs().VisitAll(func(key, value []byte) {
@@ -70,6 +68,13 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 	plugin, err := plugins.Get(args["plugin"])
 	if err != nil {
 		ctx.SetStatusCode(http.StatusNotFound)
+		return
+	}
+
+	args, err = plugins.ValidateArgs(plugin, args)
+	if err != nil {
+		ctx.SetStatusCode(http.StatusBadRequest)
+		ctx.WriteString(err.Error())
 		return
 	}
 

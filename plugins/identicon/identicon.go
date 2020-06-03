@@ -12,6 +12,7 @@ import (
 	"image/jpeg"
 	"image/png"
 	"io/ioutil"
+	"strconv"
 )
 
 type Corpus struct {
@@ -48,6 +49,11 @@ func init() {
 				Required: false,
 				Default:  "png",
 			},
+			{
+				Key:      "size",
+				Required: false,
+				Default:  "128",
+			},
 		},
 
 		Preload:  corpus.Preload,
@@ -75,6 +81,8 @@ func (c *Corpus) Generate(args plugins.ParsedArg) ([]byte, error) {
 	name := args["name"]
 	imgType := args["type"]
 
+	size, err := strconv.Atoi(args["size"])
+
 	bg := getColorByName(name)
 	initials, err := GetInitials(name, opts{
 		limit:     2,
@@ -86,7 +94,7 @@ func (c *Corpus) Generate(args plugins.ParsedArg) ([]byte, error) {
 	}
 
 	//todo: setup image size
-	dst := image.NewRGBA(image.Rect(0, 0, 128, 128))
+	dst := image.NewRGBA(image.Rect(0, 0, size, size))
 
 	// fill background
 	draw.Draw(dst, dst.Bounds(), &image.Uniform{C: bg}, image.Point{}, draw.Src)
@@ -101,9 +109,8 @@ func (c *Corpus) Generate(args plugins.ParsedArg) ([]byte, error) {
 	// calculate center
 	// work with mono fonts
 	// https://www.freetype.org/freetype2/docs/tutorial/metrics.png
-
-	dY := 128/2 + (int(bounds.Max.Y)>>6-int(bounds.Min.Y)>>6)/2
-	dX := (128 - (len(initials) * int(advance) >> 6)) / 2
+	dY := size/2 + (int(bounds.Max.Y)>>6-int(bounds.Min.Y)>>6)/2
+	dX := (size - (len(initials) * int(advance) >> 6)) / 2
 
 	point := fixed.Point26_6{X: fixed.I(dX), Y: fixed.I(dY)}
 	drawer := &font.Drawer{

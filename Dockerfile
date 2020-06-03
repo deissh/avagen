@@ -12,4 +12,4 @@ COPY --from=builder /server /avagen
 COPY RobotoMono-Regular.ttf RobotoMono-Regular.ttf
 
 EXPOSE 8080
-CMD ["/avagen serve", "--addr", "127.0.0.1:8080"]
+CMD ["/avagen", "serve", "--addr", "0.0.0.0:8080"]

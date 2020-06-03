@@ -55,7 +55,7 @@ func init() {
 			{
 				Key:      "fsize",
 				Required: false,
-				Default:  "50",
+				Default:  "40",
 			},
 		},
 

@@ -20,7 +20,6 @@ type Corpus struct {
 	fontSize    float64
 	dpi         float64
 	fontHinting font.Hinting
-	face        font.Face
 
 	font *truetype.Font
 }
@@ -29,7 +28,6 @@ func init() {
 	corpus := Corpus{
 		//todo: load from configuration
 		fontFile:    "RobotoMono-Regular.ttf",
-		fontSize:    50,
 		dpi:         100,
 		fontHinting: font.HintingFull,
 	}
@@ -54,6 +52,11 @@ func init() {
 				Required: false,
 				Default:  "128",
 			},
+			{
+				Key:      "fsize",
+				Required: false,
+				Default:  "50",
+			},
 		},
 
 		Preload:  corpus.Preload,
@@ -68,11 +71,6 @@ func (c *Corpus) Preload() error {
 	}
 
 	c.font = parsed
-	c.face = truetype.NewFace(c.font, &truetype.Options{
-		Size:    c.fontSize,
-		DPI:     c.dpi,
-		Hinting: c.fontHinting,
-	})
 
 	return nil
 }
@@ -82,6 +80,7 @@ func (c *Corpus) Generate(args plugins.ParsedArg) ([]byte, error) {
 	imgType := args["type"]
 
 	size, err := strconv.Atoi(args["size"])
+	fontSize, err := strconv.ParseFloat(args["fsize"], 64)
 
 	bg := getColorByName(name)
 	initials, err := GetInitials(name, opts{
@@ -93,7 +92,11 @@ func (c *Corpus) Generate(args plugins.ParsedArg) ([]byte, error) {
 		return nil, errors.Wrap(err, "parseInitials error")
 	}
 
-	//todo: setup image size
+	face := truetype.NewFace(c.font, &truetype.Options{
+		Size:    fontSize,
+		DPI:     c.dpi,
+		Hinting: c.fontHinting,
+	})
 	dst := image.NewRGBA(image.Rect(0, 0, size, size))
 
 	// fill background
@@ -101,7 +104,7 @@ func (c *Corpus) Generate(args plugins.ParsedArg) ([]byte, error) {
 
 	// draw text in center
 	// since the font is monospaced, you can use any letter to get the size
-	bounds, advance, ok := c.face.GlyphBounds('g')
+	bounds, advance, ok := face.GlyphBounds('g')
 	if !ok {
 		return nil, errors.New("load GlyphBounds failed")
 	}
@@ -116,7 +119,7 @@ func (c *Corpus) Generate(args plugins.ParsedArg) ([]byte, error) {
 	drawer := &font.Drawer{
 		Dst:  dst,
 		Src:  image.White,
-		Face: c.face,
+		Face: face,
 		Dot:  point,
 	}
 	drawer.DrawString(string(initials))

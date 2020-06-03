@@ -6,6 +6,8 @@ import (
 	"github.com/valyala/fasthttp"
 	"log"
 	"net/http"
+	"strconv"
+	"time"
 )
 
 var ServerCmd = &cobra.Command{
@@ -37,10 +39,23 @@ func AvatarServeCmdF(command *cobra.Command, args []string) error {
 		return err
 	}
 
+	log.Printf("Server started on %s", addr)
 	return fasthttp.ListenAndServe(addr, h)
 }
 
 func requestHandler(ctx *fasthttp.RequestCtx) {
+	begin := time.Now()
+
+	defer func() {
+		log.Printf("%v | %s %s - %v - %v",
+			ctx.RemoteAddr(),
+			ctx.Method(),
+			ctx.RequestURI(),
+			ctx.Response.Header.StatusCode(),
+			time.Now().Sub(begin),
+		)
+	}()
+
 	// default values
 	args := plugins.ParsedArg{
 		"plugin": "identicon",
@@ -64,6 +79,8 @@ func requestHandler(ctx *fasthttp.RequestCtx) {
 		return
 	}
 
-	ctx.SetBody(data)
 	ctx.Response.Header.Set("Content-Type", "image/"+args["type"])
+	ctx.Response.Header.Set("Cache-Control", "max-age=600")
+	ctx.Response.Header.Set("Content-Length", strconv.Itoa(len(data)))
+	ctx.SetBody(data)
 }

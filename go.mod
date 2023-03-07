@@ -7,6 +7,6 @@ require (
 	github.com/pkg/errors v0.8.1
 	github.com/spf13/cobra v0.0.7
 	github.com/valyala/fasthttp v1.12.0
-	golang.org/x/image v0.0.0-20200119044424-58c23975cae1
+	golang.org/x/image v0.5.0
 	stathat.com/c/consistent v1.0.0
 )
